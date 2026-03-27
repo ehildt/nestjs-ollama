@@ -4,7 +4,7 @@
     "noEmit": false,
     "declaration": true,
     "sourceMap": false,
-    "removeComments": true,
+    "removeComments": false,
     "module": "esnext",
     "moduleResolution": "bundler",
     "outDir": "./dist",

@@ -1,14 +1,23 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { ChatRequest, ChatResponse, EmbedRequest, Ollama } from "ollama";
+import {
+  ChatRequest,
+  ChatResponse,
+  CreateRequest,
+  EmbedRequest,
+  GenerateRequest,
+  GenerateResponse,
+  ListResponse,
+  Ollama,
+  ProgressResponse,
+  PullRequest,
+  PushRequest,
+  ShowRequest,
+  ShowResponse,
+  StatusResponse,
+  VersionResponse,
+} from "ollama";
 
 import { OLLAMA_CLIENT } from "../constants/ollama.constants.ts";
-
-export class OllamaEmbeddingsError extends Error {
-  constructor(message?: string, cause?: unknown) {
-    super(message, { cause });
-    this.name = this.constructor.name;
-  }
-}
 
 export class OllamaCollectionsError extends Error {
   constructor(message?: string, cause?: unknown) {
@@ -22,19 +31,11 @@ export class OllamaService {
   constructor(@Inject(OLLAMA_CLIENT) private readonly ollama: Ollama) {}
 
   /**
-   * Sends a chat request to the Ollama model.
+   * Send a chat request to the Ollama model.
    *
-   * If `request.stream` is `true`, this method returns an async iterator that streams the chat chunks.\
-   * The provided `onChunk` callback will be invoked for each streamed message chunk.\
-   * If `request.stream` is `false` or not set, the method returns the full chat response in a single object.
-   *
-   * @param request The chat request containing the model and messages. \
-   * Must include `stream: true` for streaming behavior.
-   * @param onChunk Optional callback to handle each streamed chunk. \
-   * This is required if `request.stream` is set to `true`.
-   * @returns A promise resolving to the chat response if streaming is disabled, or `void` if streaming is enabled and `onChunk` is used.
-   * @throws {Error} If `request.stream` is `true` and `onChunk` is not provided. \
-   * The error message will indicate that a callback is required for streaming.
+   * When `request.stream` is `true`, pass an `onChunk` callback to handle each streamed chunk.
+   * @see https://github.com/ollama/ollama-js#chat
+   * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#chat-streaming
    */
   async chat(request: ChatRequest, onChunk?: (chunk: ChatResponse) => Promise<void> | void) {
     if (!request.stream) return await this.ollama.chat({ ...request, stream: false });
@@ -44,14 +45,115 @@ export class OllamaService {
   }
 
   /**
-   * Computes vector embeddings for the given input using the specified model.
+   * Generate a response from a prompt.
    *
-   * @param request The embeddings request, including model name and input text.
-   * @returns A promise resolving to the embeddings result.
+   * Use for single-shot text generation tasks like summarization, translation, or code completion.
+   * When `request.stream` is `true`, pass an `onChunk` callback to handle each streamed chunk.
+   * @see https://github.com/ollama/ollama-js#generate
+   * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#generate-streaming
+   */
+  async generate(request: GenerateRequest, onChunk?: (chunk: GenerateResponse) => Promise<void> | void) {
+    if (!request.stream) return await this.ollama.generate({ ...request, stream: false });
+    if (!onChunk) throw new Error("Streaming requires an onChunk callback");
+    const stream = await this.ollama.generate({ ...request, stream: true });
+    for await (const chunk of stream) await onChunk(chunk);
+  }
+
+  /**
+   * Computes vector embeddings for the given input.
+   * @see https://github.com/ollama/ollama-js#embed
    */
   async embed(request: EmbedRequest) {
-    const response = await this.ollama.embed(request);
-    if (response?.embeddings?.length) return response;
-    throw new OllamaEmbeddingsError(`No or empty embeddings were returned by Ollama (model: ${request.model}).`);
+    return await this.ollama.embed(request);
+  }
+
+  /**
+   * Download a model from the Ollama registry.
+   *
+   * When `request.stream` is `true`, pass an `onChunk` callback to handle each streamed chunk.
+   * @see https://github.com/ollama/ollama-js#pull
+   * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#pull-model-streaming
+   */
+  async pull(request: PullRequest, onChunk?: (chunk: ProgressResponse) => Promise<void> | void) {
+    if (!request.stream) return await this.ollama.pull({ ...request, stream: false });
+    if (!onChunk) throw new Error("Streaming requires an onChunk callback");
+    const stream = await this.ollama.pull({ ...request, stream: true });
+    for await (const chunk of stream) await onChunk(chunk);
+  }
+
+  /**
+   * Upload a model to the Ollama registry.
+   *
+   * When `request.stream` is `true`, pass an `onChunk` callback to handle each streamed chunk.
+   * @see https://github.com/ollama/ollama-js#push
+   * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#push-model-streaming
+   */
+  async push(request: PushRequest, onChunk?: (chunk: ProgressResponse) => Promise<void> | void) {
+    if (!request.stream) return await this.ollama.push({ ...request, stream: false });
+    if (!onChunk) throw new Error("Streaming requires an onChunk callback");
+    const stream = await this.ollama.push({ ...request, stream: true });
+    for await (const chunk of stream) await onChunk(chunk);
+  }
+
+  /**
+   * Create a model from a base model.
+   *
+   * When `request.stream` is `true`, pass an `onChunk` callback to handle each streamed chunk.
+   * @see https://github.com/ollama/ollama-js#create
+   * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#create-model-streaming
+   */
+  async create(request: CreateRequest, onChunk?: (chunk: ProgressResponse) => Promise<void> | void) {
+    if (!request.stream) return await this.ollama.create({ ...request, stream: false });
+    if (!onChunk) throw new Error("Streaming requires an onChunk callback");
+    const stream = await this.ollama.create({ ...request, stream: true });
+    for await (const chunk of stream) await onChunk(chunk);
+  }
+
+  /**
+   * Delete a model from local storage.
+   * @see https://github.com/ollama/ollama-js#delete
+   */
+  async delete(request: { model: string }): Promise<StatusResponse> {
+    return await this.ollama.delete(request);
+  }
+
+  /**
+   * Copy a model to a new name.
+   * @see https://github.com/ollama/ollama-js#copy
+   */
+  async copy(request: { source: string; destination: string }): Promise<StatusResponse> {
+    return await this.ollama.copy(request);
+  }
+
+  /**
+   * List all available models.
+   * @see https://github.com/ollama/ollama-js#list
+   */
+  async list(): Promise<ListResponse> {
+    return await this.ollama.list();
+  }
+
+  /**
+   * Show model information (system prompt, template, etc.).
+   * @see https://github.com/ollama/ollama-js#show
+   */
+  async show(request: ShowRequest): Promise<ShowResponse> {
+    return await this.ollama.show(request);
+  }
+
+  /**
+   * List currently running models.
+   * @see https://github.com/ollama/ollama-js#ps
+   */
+  async ps(): Promise<ListResponse> {
+    return await this.ollama.ps();
+  }
+
+  /**
+   * Get the Ollama server version.
+   * @see https://github.com/ollama/ollama-js#version
+   */
+  async version(): Promise<VersionResponse> {
+    return await this.ollama.version();
   }
 }

@@ -1,6 +1,6 @@
 # @ehildt/nestjs-ollama
 
-A lightweight NestJS wrapper for Ollama JS with chat and embeddings support.
+A lightweight NestJS wrapper for Ollama JS with support for all Ollama operations.
 
 **Requirements:**
 - ESM-only (does not support CommonJS)
@@ -77,10 +77,9 @@ For configuration options and types, see [Configuration](./Configuration.md).
 | Export | Description |
 |--------|-------------|
 | `OllamaModule` | Dynamic NestJS module for Ollama |
-| `OllamaService` | Service for chat and embeddings |
+| `OllamaService` | Service for all Ollama operations |
 | `OllamaConfig` | Type for configuration options |
 | `OllamaConfigSchema` | Joi validation schema for config |
-| `OllamaEmbeddingsError` | Error thrown when embeddings are empty |
 
 ## Related
 
