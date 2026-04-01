@@ -19,13 +19,6 @@ import {
 
 import { OLLAMA_CLIENT } from "../constants/ollama.constants.ts";
 
-export class OllamaCollectionsError extends Error {
-  constructor(message?: string, cause?: unknown) {
-    super(message, { cause });
-    this.name = this.constructor.name;
-  }
-}
-
 @Injectable()
 export class OllamaService {
   constructor(@Inject(OLLAMA_CLIENT) private readonly ollama: Ollama) {}

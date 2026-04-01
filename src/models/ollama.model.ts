@@ -1,6 +1,6 @@
 import { Config } from "ollama";
 
-export type OllamaConfigFactory = (...deps: any[]) => Promise<Config>;
+export type OllamaConfigFactory = (...deps: any[]) => Promise<Config> | Config;
 
 export type OllamaModuleProps = {
   global?: boolean;

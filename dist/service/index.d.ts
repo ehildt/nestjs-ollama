@@ -1,9 +1,6 @@
 import * as ollama from 'ollama';
 import { Ollama, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, EmbedRequest, PullRequest, ProgressResponse, PushRequest, CreateRequest, StatusResponse, ListResponse, ShowRequest, ShowResponse, VersionResponse } from 'ollama';
 
-declare class OllamaCollectionsError extends Error {
-    constructor(message?: string, cause?: unknown);
-}
 declare class OllamaService {
     private readonly ollama;
     constructor(ollama: Ollama);
@@ -90,4 +87,4 @@ declare class OllamaService {
     version(): Promise<VersionResponse>;
 }
 
-export { OllamaCollectionsError, OllamaService };
+export { OllamaService };

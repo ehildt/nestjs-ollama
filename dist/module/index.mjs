@@ -144,7 +144,7 @@ var OllamaModule = class {
     return {
       global: options.global,
       module: OllamaModule,
-      exports: [OLLAMA_CLIENT, OllamaService],
+      exports: [OllamaService],
       providers: [
         OllamaService,
         {

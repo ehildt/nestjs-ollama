@@ -14,12 +14,6 @@ var __decorateParam = (index, decorator) => (target, key) => decorator(target, k
 var OLLAMA_CLIENT = /* @__PURE__ */ Symbol("OLLAMA_CLIENT");
 
 // src/service/ollama.service.ts
-var OllamaCollectionsError = class extends Error {
-  constructor(message, cause) {
-    super(message, { cause });
-    this.name = this.constructor.name;
-  }
-};
 var OllamaService = class {
   constructor(ollama) {
     this.ollama = ollama;
@@ -145,4 +139,4 @@ OllamaService = __decorateClass([
   __decorateParam(0, Inject(OLLAMA_CLIENT))
 ], OllamaService);
 
-export { OllamaCollectionsError, OllamaService };
+export { OllamaService };

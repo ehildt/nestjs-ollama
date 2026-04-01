@@ -21,7 +21,6 @@ describe("OllamaModule", () => {
 
       expect(module.module).toBe(OllamaModule);
       expect(module.exports).toBeDefined();
-      expect(module.exports).toContain(OLLAMA_CLIENT);
       expect(module.exports).toContain(OllamaService);
     });
 
