@@ -33,18 +33,18 @@ OllamaModule.registerAsync({
   useFactory: async (configService: ConfigService) => ({
     host: configService.get("OLLAMA_HOST"),
   }),
-})
+});
 ```
 
 For production apps, you can validate config using the Joi schema:
 
 ```typescript
-import { OllamaConfigSchema } from "@ehildt/nestjs-ollama/schema";
+import { OllamaConfigSchema } from "@ehildt/nestjs-ollama";
 import Joi from "joi";
 
 const config = Joi.attempt(
   { host: process.env.OLLAMA_HOST },
-  OllamaConfigSchema,
+  OllamaConfigSchema
 );
 ```
 
@@ -56,7 +56,7 @@ See [Validation Schemas](./Validation-Schemas.md) for the Joi schema.
 ```typescript
 // my.service.ts
 import { Injectable } from "@nestjs/common";
-import { OllamaService } from "@ehildt/nestjs-ollama/service";
+import { OllamaService } from "@ehildt/nestjs-ollama";
 
 @Injectable()
 export class MyService {

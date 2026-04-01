@@ -57,13 +57,19 @@ describe("OllamaService", () => {
 
   describe("chat", () => {
     it("should call ollama.chat with stream: false when stream is not set", async () => {
-      const mockRequest = { model: "llama2", messages: [{ role: "user", content: "hello" }] };
+      const mockRequest = {
+        model: "llama2",
+        messages: [{ role: "user", content: "hello" }],
+      };
       const mockResponse = { message: { role: "assistant", content: "hi" } };
       mockOllama.chat.mockResolvedValue(mockResponse);
 
       const result = await service.chat(mockRequest);
 
-      expect(mockOllama.chat).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.chat).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -74,7 +80,10 @@ describe("OllamaService", () => {
 
       const result = await service.chat(mockRequest);
 
-      expect(mockOllama.chat).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.chat).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -129,7 +138,10 @@ describe("OllamaService", () => {
 
       const result = await service.generate(mockRequest);
 
-      expect(mockOllama.generate).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.generate).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -140,7 +152,10 @@ describe("OllamaService", () => {
 
       const result = await service.generate(mockRequest);
 
-      expect(mockOllama.generate).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.generate).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -179,7 +194,10 @@ describe("OllamaService", () => {
 
       const result = await service.pull(mockRequest);
 
-      expect(mockOllama.pull).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.pull).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -218,7 +236,10 @@ describe("OllamaService", () => {
 
       const result = await service.push(mockRequest);
 
-      expect(mockOllama.push).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.push).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -257,7 +278,10 @@ describe("OllamaService", () => {
 
       const result = await service.create(mockRequest);
 
-      expect(mockOllama.create).toHaveBeenCalledWith({ ...mockRequest, stream: false });
+      expect(mockOllama.create).toHaveBeenCalledWith({
+        ...mockRequest,
+        stream: false,
+      });
       expect(result).toEqual(mockResponse);
     });
 
@@ -329,7 +353,10 @@ describe("OllamaService", () => {
   describe("show", () => {
     it("should call ollama.show", async () => {
       const mockRequest = { model: "llama2" };
-      const mockResponse = { model: "llama2", system: "You are a helpful assistant" };
+      const mockResponse = {
+        model: "llama2",
+        system: "You are a helpful assistant",
+      };
       mockOllama.show.mockResolvedValue(mockResponse);
 
       const result = await service.show(mockRequest);

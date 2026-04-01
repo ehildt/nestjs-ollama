@@ -1,5 +1,24 @@
 import * as ollama from 'ollama';
-import { Ollama, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, EmbedRequest, PullRequest, ProgressResponse, PushRequest, CreateRequest, StatusResponse, ListResponse, ShowRequest, ShowResponse, VersionResponse } from 'ollama';
+import { Config, Ollama, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, EmbedRequest, PullRequest, ProgressResponse, PushRequest, CreateRequest, StatusResponse, ListResponse, ShowRequest, ShowResponse, VersionResponse } from 'ollama';
+export { EmbedResponse } from 'ollama';
+import { DynamicModule } from '@nestjs/common';
+import Joi from 'joi';
+
+declare const OLLAMA_CLIENT: unique symbol;
+
+type OllamaConfigFactory = (...deps: any[]) => Promise<Config> | Config;
+type OllamaModuleProps = {
+    global?: boolean;
+    inject: Array<any>;
+    useFactory: OllamaConfigFactory;
+};
+
+declare class OllamaModule {
+    static registerAsync(options: OllamaModuleProps): DynamicModule;
+}
+
+declare const headersInitSchema: Joi.AlternativesSchema<any>;
+declare const OllamaConfigSchema: Joi.ObjectSchema<any>;
 
 declare class OllamaService {
     private readonly ollama;
@@ -87,4 +106,4 @@ declare class OllamaService {
     version(): Promise<VersionResponse>;
 }
 
-export { OllamaService };
+export { OLLAMA_CLIENT, type OllamaConfigFactory, OllamaConfigSchema, OllamaModule, type OllamaModuleProps, OllamaService, headersInitSchema };

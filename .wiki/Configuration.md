@@ -15,12 +15,12 @@ interface Config {
 }
 ```
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `host` | `string` | Yes | The Ollama server URL (e.g., `http://localhost:11434`) |
-| `fetch` | `typeof fetch` | No | Custom fetch implementation |
-| `proxy` | `boolean` | No | Enable proxy support |
-| `headers` | `HeadersInit` | No | Additional headers to send with requests |
+| Property  | Type           | Required | Description                                            |
+| --------- | -------------- | -------- | ------------------------------------------------------ |
+| `host`    | `string`       | Yes      | The Ollama server URL (e.g., `http://localhost:11434`) |
+| `fetch`   | `typeof fetch` | No       | Custom fetch implementation                            |
+| `proxy`   | `boolean`      | No       | Enable proxy support                                   |
+| `headers` | `HeadersInit`  | No       | Additional headers to send with requests               |
 
 ## Basic Example
 
@@ -47,10 +47,10 @@ OllamaModule.registerAsync({
   useFactory: async () => ({
     host: "http://localhost:11434",
     headers: {
-      "Authorization": "Bearer token",
+      Authorization: "Bearer token",
     },
   }),
-})
+});
 ```
 
 ## Using Environment Variables
@@ -76,17 +76,17 @@ export class AppModule {}
 ## With Joi Validation
 
 ```typescript
-import { OllamaConfigSchema } from "@ehildt/nestjs-ollama/schema";
+import { OllamaConfigSchema } from "@ehildt/nestjs-ollama";
 import Joi from "joi";
 
 const config = Joi.attempt(
   { host: process.env.OLLAMA_HOST },
-  OllamaConfigSchema,
+  OllamaConfigSchema
 );
 
 OllamaModule.registerAsync({
   useFactory: async () => config,
-})
+});
 ```
 
 See [Validation Schemas](./Validation-Schemas.md) for more details on the Joi schema.

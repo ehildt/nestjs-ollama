@@ -1,4 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Module } from '@nestjs/common';
+import Joi from 'joi';
 
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __decorateClass = (decorators, target, key, kind) => {
@@ -12,8 +13,6 @@ var __decorateParam = (index, decorator) => (target, key) => decorator(target, k
 
 // src/constants/ollama.constants.ts
 var OLLAMA_CLIENT = /* @__PURE__ */ Symbol("OLLAMA_CLIENT");
-
-// src/service/ollama.service.ts
 var OllamaService = class {
   constructor(ollama) {
     this.ollama = ollama;
@@ -139,4 +138,38 @@ OllamaService = __decorateClass([
   __decorateParam(0, Inject(OLLAMA_CLIENT))
 ], OllamaService);
 
-export { OllamaService };
+// src/module/ollama.module.ts
+var OllamaModule = class {
+  static registerAsync(options) {
+    const OllamaConfigProvider = {
+      provide: OLLAMA_CLIENT,
+      inject: options.inject,
+      useFactory: options.useFactory
+    };
+    return {
+      global: options.global,
+      module: OllamaModule,
+      exports: [OllamaService],
+      providers: [OllamaConfigProvider, OllamaService]
+    };
+  }
+};
+OllamaModule = __decorateClass([
+  Module({})
+], OllamaModule);
+var headersInitSchema = Joi.alternatives().try(
+  Joi.array().items(Joi.array().length(2).ordered(Joi.string(), Joi.string())),
+  Joi.object().pattern(Joi.string(), Joi.string()),
+  Joi.custom((value) => {
+    if (value instanceof Headers) return value;
+    throw new Error("Expected Headers instance");
+  })
+);
+var OllamaConfigSchema = Joi.object({
+  host: Joi.string().required(),
+  fetch: Joi.function().optional(),
+  proxy: Joi.boolean().optional(),
+  headers: headersInitSchema.optional()
+}).required();
+
+export { OLLAMA_CLIENT, OllamaConfigSchema, OllamaModule, OllamaService, headersInitSchema };
