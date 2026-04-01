@@ -14,6 +14,8 @@ A lightweight NestJS wrapper for Ollama JS with chat and embeddings support.
 <!-- DEPBADGE:START -->
 <div align="center">
 
+
+
 # StatusBadges
 
 ![github](https://img.shields.io/github/release/ehildt/nestjs-ollama?labelColor=333&style=for-the-badge&cacheSeconds=3600&color=b16425&logo=github&logoColor=b16425&logoWidth=40&branch=main)
@@ -25,6 +27,8 @@ A lightweight NestJS wrapper for Ollama JS with chat and embeddings support.
 <br>
 
 <div align="center">
+
+
 
 # DevDependencies
 
@@ -57,6 +61,8 @@ A lightweight NestJS wrapper for Ollama JS with chat and embeddings support.
 <br>
 
 <div align="center">
+
+
 
 # PeerDependencies
 
