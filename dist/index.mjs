@@ -155,8 +155,8 @@ var OllamaModule = class {
       useFactory: options.useFactory
     };
     return {
-      global: options.global,
       module: OllamaModule,
+      global: options.global,
       exports: [OllamaService],
       providers: [OllamaConfigProvider, OllamaService]
     };
