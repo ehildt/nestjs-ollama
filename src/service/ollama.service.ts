@@ -1,7 +1,8 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import {
   ChatRequest,
   ChatResponse,
+  Config,
   CreateRequest,
   EmbedRequest,
   GenerateRequest,
@@ -17,11 +18,20 @@ import {
   VersionResponse,
 } from "ollama";
 
-import { OLLAMA_CLIENT } from "../constants/ollama.constants.ts";
+import { NESTJS_OLLAMA_CONFIG } from "../constants/ollama.constants.ts";
 
 @Injectable()
-export class OllamaService {
-  constructor(@Inject(OLLAMA_CLIENT) private readonly ollama: Ollama) {}
+export class OllamaService implements OnModuleInit {
+  private client: Ollama | null = null;
+  constructor(@Inject(NESTJS_OLLAMA_CONFIG) private readonly config: Config) {}
+
+  onModuleInit() {
+    this.client = new Ollama(this.config);
+  }
+
+  get ollama() {
+    return this.client;
+  }
 
   /**
    * Send a chat request to the Ollama model.
@@ -31,9 +41,9 @@ export class OllamaService {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#chat-streaming
    */
   async chat(request: ChatRequest, onChunk?: (chunk: ChatResponse) => Promise<void> | void) {
-    if (!request.stream) return await this.ollama.chat({ ...request, stream: false });
+    if (!request.stream) return await this.client!.chat({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.chat({ ...request, stream: true });
+    const stream = await this.client!.chat({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
 
@@ -46,9 +56,9 @@ export class OllamaService {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#generate-streaming
    */
   async generate(request: GenerateRequest, onChunk?: (chunk: GenerateResponse) => Promise<void> | void) {
-    if (!request.stream) return await this.ollama.generate({ ...request, stream: false });
+    if (!request.stream) return await this.client!.generate({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.generate({ ...request, stream: true });
+    const stream = await this.client!.generate({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
 
@@ -57,7 +67,7 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#embed
    */
   async embed(request: EmbedRequest) {
-    return await this.ollama.embed(request);
+    return await this.client!.embed(request);
   }
 
   /**
@@ -68,9 +78,9 @@ export class OllamaService {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#pull-model-streaming
    */
   async pull(request: PullRequest, onChunk?: (chunk: ProgressResponse) => Promise<void> | void) {
-    if (!request.stream) return await this.ollama.pull({ ...request, stream: false });
+    if (!request.stream) return await this.client!.pull({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.pull({ ...request, stream: true });
+    const stream = await this.client!.pull({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
 
@@ -82,9 +92,9 @@ export class OllamaService {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#push-model-streaming
    */
   async push(request: PushRequest, onChunk?: (chunk: ProgressResponse) => Promise<void> | void) {
-    if (!request.stream) return await this.ollama.push({ ...request, stream: false });
+    if (!request.stream) return await this.client!.push({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.push({ ...request, stream: true });
+    const stream = await this.client!.push({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
 
@@ -96,9 +106,9 @@ export class OllamaService {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#create-model-streaming
    */
   async create(request: CreateRequest, onChunk?: (chunk: ProgressResponse) => Promise<void> | void) {
-    if (!request.stream) return await this.ollama.create({ ...request, stream: false });
+    if (!request.stream) return await this.client!.create({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.create({ ...request, stream: true });
+    const stream = await this.client!.create({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
 
@@ -107,7 +117,7 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#delete
    */
   async delete(request: { model: string }): Promise<StatusResponse> {
-    return await this.ollama.delete(request);
+    return await this.client!.delete(request);
   }
 
   /**
@@ -115,7 +125,7 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#copy
    */
   async copy(request: { source: string; destination: string }): Promise<StatusResponse> {
-    return await this.ollama.copy(request);
+    return await this.client!.copy(request);
   }
 
   /**
@@ -123,7 +133,7 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#list
    */
   async list(): Promise<ListResponse> {
-    return await this.ollama.list();
+    return await this.client!.list();
   }
 
   /**
@@ -131,7 +141,7 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#show
    */
   async show(request: ShowRequest): Promise<ShowResponse> {
-    return await this.ollama.show(request);
+    return await this.client!.show(request);
   }
 
   /**
@@ -139,7 +149,7 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#ps
    */
   async ps(): Promise<ListResponse> {
-    return await this.ollama.ps();
+    return await this.client!.ps();
   }
 
   /**
@@ -147,6 +157,6 @@ export class OllamaService {
    * @see https://github.com/ollama/ollama-js#version
    */
   async version(): Promise<VersionResponse> {
-    return await this.ollama.version();
+    return await this.client!.version();
   }
 }

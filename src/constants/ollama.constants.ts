@@ -1,1 +1,1 @@
-export const OLLAMA_CLIENT = Symbol("OLLAMA_CLIENT");
+export const NESTJS_OLLAMA_CONFIG = Symbol("NESTJS_OLLAMA_CONFIG");

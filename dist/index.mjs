@@ -1,4 +1,5 @@
 import { Injectable, Inject, Module } from '@nestjs/common';
+import { Ollama } from 'ollama';
 import Joi from 'joi';
 
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -12,10 +13,17 @@ var __decorateClass = (decorators, target, key, kind) => {
 var __decorateParam = (index, decorator) => (target, key) => decorator(target, key, index);
 
 // src/constants/ollama.constants.ts
-var OLLAMA_CLIENT = /* @__PURE__ */ Symbol("OLLAMA_CLIENT");
+var NESTJS_OLLAMA_CONFIG = /* @__PURE__ */ Symbol("NESTJS_OLLAMA_CONFIG");
 var OllamaService = class {
-  constructor(ollama) {
-    this.ollama = ollama;
+  constructor(config) {
+    this.config = config;
+  }
+  client = null;
+  onModuleInit() {
+    this.client = new Ollama(this.config);
+  }
+  get ollama() {
+    return this.client;
   }
   /**
    * Send a chat request to the Ollama model.
@@ -25,9 +33,9 @@ var OllamaService = class {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#chat-streaming
    */
   async chat(request, onChunk) {
-    if (!request.stream) return await this.ollama.chat({ ...request, stream: false });
+    if (!request.stream) return await this.client.chat({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.chat({ ...request, stream: true });
+    const stream = await this.client.chat({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
   /**
@@ -39,9 +47,9 @@ var OllamaService = class {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#generate-streaming
    */
   async generate(request, onChunk) {
-    if (!request.stream) return await this.ollama.generate({ ...request, stream: false });
+    if (!request.stream) return await this.client.generate({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.generate({ ...request, stream: true });
+    const stream = await this.client.generate({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
   /**
@@ -49,7 +57,7 @@ var OllamaService = class {
    * @see https://github.com/ollama/ollama-js#embed
    */
   async embed(request) {
-    return await this.ollama.embed(request);
+    return await this.client.embed(request);
   }
   /**
    * Download a model from the Ollama registry.
@@ -59,9 +67,9 @@ var OllamaService = class {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#pull-model-streaming
    */
   async pull(request, onChunk) {
-    if (!request.stream) return await this.ollama.pull({ ...request, stream: false });
+    if (!request.stream) return await this.client.pull({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.pull({ ...request, stream: true });
+    const stream = await this.client.pull({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
   /**
@@ -72,9 +80,9 @@ var OllamaService = class {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#push-model-streaming
    */
   async push(request, onChunk) {
-    if (!request.stream) return await this.ollama.push({ ...request, stream: false });
+    if (!request.stream) return await this.client.push({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.push({ ...request, stream: true });
+    const stream = await this.client.push({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
   /**
@@ -85,9 +93,9 @@ var OllamaService = class {
    * @see https://github.com/ehildt/nestjs-ollama/wiki/Usage#create-model-streaming
    */
   async create(request, onChunk) {
-    if (!request.stream) return await this.ollama.create({ ...request, stream: false });
+    if (!request.stream) return await this.client.create({ ...request, stream: false });
     if (!onChunk) throw new Error("Streaming requires an onChunk callback");
-    const stream = await this.ollama.create({ ...request, stream: true });
+    const stream = await this.client.create({ ...request, stream: true });
     for await (const chunk of stream) await onChunk(chunk);
   }
   /**
@@ -95,54 +103,54 @@ var OllamaService = class {
    * @see https://github.com/ollama/ollama-js#delete
    */
   async delete(request) {
-    return await this.ollama.delete(request);
+    return await this.client.delete(request);
   }
   /**
    * Copy a model to a new name.
    * @see https://github.com/ollama/ollama-js#copy
    */
   async copy(request) {
-    return await this.ollama.copy(request);
+    return await this.client.copy(request);
   }
   /**
    * List all available models.
    * @see https://github.com/ollama/ollama-js#list
    */
   async list() {
-    return await this.ollama.list();
+    return await this.client.list();
   }
   /**
    * Show model information (system prompt, template, etc.).
    * @see https://github.com/ollama/ollama-js#show
    */
   async show(request) {
-    return await this.ollama.show(request);
+    return await this.client.show(request);
   }
   /**
    * List currently running models.
    * @see https://github.com/ollama/ollama-js#ps
    */
   async ps() {
-    return await this.ollama.ps();
+    return await this.client.ps();
   }
   /**
    * Get the Ollama server version.
    * @see https://github.com/ollama/ollama-js#version
    */
   async version() {
-    return await this.ollama.version();
+    return await this.client.version();
   }
 };
 OllamaService = __decorateClass([
   Injectable(),
-  __decorateParam(0, Inject(OLLAMA_CLIENT))
+  __decorateParam(0, Inject(NESTJS_OLLAMA_CONFIG))
 ], OllamaService);
 
 // src/module/ollama.module.ts
 var OllamaModule = class {
   static registerAsync(options) {
     const OllamaConfigProvider = {
-      provide: OLLAMA_CLIENT,
+      provide: NESTJS_OLLAMA_CONFIG,
       inject: options.inject,
       useFactory: options.useFactory
     };
@@ -172,4 +180,4 @@ var OllamaConfigSchema = Joi.object({
   headers: headersInitSchema.optional()
 }).required();
 
-export { OLLAMA_CLIENT, OllamaConfigSchema, OllamaModule, OllamaService, headersInitSchema };
+export { NESTJS_OLLAMA_CONFIG, OllamaConfigSchema, OllamaModule, OllamaService, headersInitSchema };

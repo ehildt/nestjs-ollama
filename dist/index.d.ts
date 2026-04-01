@@ -1,10 +1,9 @@
 import * as ollama from 'ollama';
 import { Config, Ollama, ChatRequest, ChatResponse, GenerateRequest, GenerateResponse, EmbedRequest, PullRequest, ProgressResponse, PushRequest, CreateRequest, StatusResponse, ListResponse, ShowRequest, ShowResponse, VersionResponse } from 'ollama';
-export { EmbedResponse } from 'ollama';
-import { DynamicModule } from '@nestjs/common';
+import { DynamicModule, OnModuleInit } from '@nestjs/common';
 import Joi from 'joi';
 
-declare const OLLAMA_CLIENT: unique symbol;
+declare const NESTJS_OLLAMA_CONFIG: unique symbol;
 
 type OllamaConfigFactory = (...deps: any[]) => Promise<Config> | Config;
 type OllamaModuleProps = {
@@ -20,9 +19,12 @@ declare class OllamaModule {
 declare const headersInitSchema: Joi.AlternativesSchema<any>;
 declare const OllamaConfigSchema: Joi.ObjectSchema<any>;
 
-declare class OllamaService {
-    private readonly ollama;
-    constructor(ollama: Ollama);
+declare class OllamaService implements OnModuleInit {
+    private readonly config;
+    private client;
+    constructor(config: Config);
+    onModuleInit(): void;
+    get ollama(): Ollama | null;
     /**
      * Send a chat request to the Ollama model.
      *
@@ -106,4 +108,4 @@ declare class OllamaService {
     version(): Promise<VersionResponse>;
 }
 
-export { OLLAMA_CLIENT, type OllamaConfigFactory, OllamaConfigSchema, OllamaModule, type OllamaModuleProps, OllamaService, headersInitSchema };
+export { NESTJS_OLLAMA_CONFIG, type OllamaConfigFactory, OllamaConfigSchema, OllamaModule, type OllamaModuleProps, OllamaService, headersInitSchema };

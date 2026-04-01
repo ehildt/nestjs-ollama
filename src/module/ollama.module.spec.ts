@@ -1,7 +1,7 @@
 import { Config } from "ollama";
 import { describe, expect, it, vi } from "vitest";
 
-import { OLLAMA_CLIENT } from "../constants/ollama.constants.ts";
+import { NESTJS_OLLAMA_CONFIG } from "../constants/ollama.constants.ts";
 import { OllamaService } from "../service/ollama.service.ts";
 
 import { OllamaModule } from "./ollama.module.ts";
@@ -64,7 +64,7 @@ describe("OllamaModule", () => {
       });
 
       const ollamaProvider = module.providers?.find(
-        (p) => typeof p === "object" && "provide" in p && p.provide === OLLAMA_CLIENT,
+        (p) => typeof p === "object" && "provide" in p && p.provide === NESTJS_OLLAMA_CONFIG,
       );
       expect(ollamaProvider).toBeDefined();
     });
@@ -78,7 +78,7 @@ describe("OllamaModule", () => {
       });
 
       const ollamaProvider = module.providers?.find(
-        (p) => typeof p === "object" && "provide" in p && p.provide === OLLAMA_CLIENT,
+        (p) => typeof p === "object" && "provide" in p && p.provide === NESTJS_OLLAMA_CONFIG,
       );
       expect(ollamaProvider).toBeDefined();
       expect((ollamaProvider as { inject?: string[] }).inject).toEqual(inject);

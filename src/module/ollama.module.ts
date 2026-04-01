@@ -1,6 +1,6 @@
 import { DynamicModule, Module, Provider } from "@nestjs/common";
 
-import { OLLAMA_CLIENT } from "../constants/ollama.constants.ts";
+import { NESTJS_OLLAMA_CONFIG } from "../constants/ollama.constants.ts";
 import { OllamaModuleProps } from "../models/ollama.model.ts";
 import { OllamaService } from "../service/ollama.service.ts";
 
@@ -8,14 +8,14 @@ import { OllamaService } from "../service/ollama.service.ts";
 export class OllamaModule {
   static registerAsync(options: OllamaModuleProps): DynamicModule {
     const OllamaConfigProvider: Provider = {
-      provide: OLLAMA_CLIENT,
+      provide: NESTJS_OLLAMA_CONFIG,
       inject: options.inject,
       useFactory: options.useFactory,
     };
 
     return {
-      global: options.global,
       module: OllamaModule,
+      global: options.global,
       exports: [OllamaService],
       providers: [OllamaConfigProvider, OllamaService],
     };

@@ -1,4 +1,4 @@
-import { Config } from "ollama";
+import type { Config } from "ollama";
 
 export type OllamaConfigFactory = (...deps: any[]) => Promise<Config> | Config;
 
@@ -7,5 +7,3 @@ export type OllamaModuleProps = {
   inject: Array<any>;
   useFactory: OllamaConfigFactory;
 };
-
-export type { EmbedResponse } from "ollama";
