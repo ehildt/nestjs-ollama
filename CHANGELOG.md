@@ -1,5 +1,11 @@
 # @ehildt/nestjs-ollama
 
+## 1.2.0
+
+### Minor Changes
+
+- cb3e783: Rename config injection constant and add lazy client initialization
+
 ## 1.1.0
 
 ### Minor Changes
