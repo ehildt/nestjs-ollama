@@ -1,5 +1,11 @@
 # @ehildt/nestjs-ollama
 
+## 1.1.0
+
+### Minor Changes
+
+- 8b116af: Consolidate exports into single entry point
+
 ## 1.0.1
 
 ### Patch Changes
