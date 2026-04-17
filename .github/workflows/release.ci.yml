@@ -10,6 +10,7 @@ env:
   HUSKY: 0
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
 
@@ -160,6 +161,11 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install --frozen-lockfile
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Version bump & publish
         run: |

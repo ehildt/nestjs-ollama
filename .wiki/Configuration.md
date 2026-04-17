@@ -53,6 +53,71 @@ OllamaModule.registerAsync({
 });
 ```
 
+### API Key Authentication
+
+```typescript
+OllamaModule.registerAsync({
+  inject: [ConfigService],
+  useFactory: async (configService: ConfigService) => ({
+    host: configService.get("OLLAMA_HOST"),
+    headers: {
+      Authorization: `Bearer ${configService.get("OLLAMA_API_KEY")}`,
+    },
+  }),
+});
+```
+
+### Ollama.com Authentication
+
+When connecting to ollama.com, the library automatically adds the `Authorization` header from the `OLLAMA_API_KEY` environment variable. You can also manually configure it:
+
+```typescript
+OllamaModule.registerAsync({
+  inject: [ConfigService],
+  useFactory: async (configService: ConfigService) => ({
+    host: "https://ollama.com",
+    headers: {
+      Authorization: `Bearer ${configService.get("OLLAMA_API_KEY")}`,
+    },
+  }),
+});
+```
+
+### Multiple Custom Headers
+
+```typescript
+OllamaModule.registerAsync({
+  useFactory: async () => ({
+    host: "http://localhost:11434",
+    headers: {
+      Authorization: "Bearer token",
+      "X-Request-ID": "uuid-1234",
+      "X-Custom-Header": "custom-value",
+      "X-Client-Version": "1.0.0",
+    },
+  }),
+});
+```
+
+### Headers with HeadersInit Object
+
+You can also use a Headers object:
+
+```typescript
+OllamaModule.registerAsync({
+  useFactory: async () => {
+    const headers = new Headers();
+    headers.append("Authorization", "Bearer token");
+    headers.append("X-Custom-Header", "custom-value");
+
+    return {
+      host: "http://localhost:11434",
+      headers,
+    };
+  },
+});
+```
+
 ## Using Environment Variables
 
 ```typescript

@@ -400,4 +400,81 @@ describe("OllamaService", () => {
       expect(result).toEqual(mockResponse);
     });
   });
+
+  describe("config with headers", () => {
+    it("should pass headers to Ollama client", async () => {
+      const configWithHeaders = {
+        host: "http://localhost:11434",
+        headers: {
+          Authorization: "Bearer test-token",
+          "X-Custom-Header": "custom-value",
+        },
+      };
+
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          OllamaService,
+          {
+            provide: NESTJS_OLLAMA_CONFIG,
+            useValue: configWithHeaders,
+          },
+        ],
+      }).compile();
+
+      const serviceWithHeaders = module.get<OllamaService>(OllamaService);
+      await serviceWithHeaders.onModuleInit();
+
+      expect(serviceWithHeaders).toBeDefined();
+      expect(serviceWithHeaders.ollama).toBeDefined();
+    });
+
+    it("should pass headers object to Ollama client", async () => {
+      const headers = new Headers();
+      headers.append("Authorization", "Bearer token");
+      headers.append("X-Request-ID", "uuid-123");
+
+      const configWithHeaders = {
+        host: "http://localhost:11434",
+        headers,
+      };
+
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          OllamaService,
+          {
+            provide: NESTJS_OLLAMA_CONFIG,
+            useValue: configWithHeaders,
+          },
+        ],
+      }).compile();
+
+      const serviceWithHeaders = module.get<OllamaService>(OllamaService);
+      await serviceWithHeaders.onModuleInit();
+
+      expect(serviceWithHeaders).toBeDefined();
+      expect(serviceWithHeaders.ollama).toBeDefined();
+    });
+
+    it("should work without headers", async () => {
+      const configWithoutHeaders = {
+        host: "http://localhost:11434",
+      };
+
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          OllamaService,
+          {
+            provide: NESTJS_OLLAMA_CONFIG,
+            useValue: configWithoutHeaders,
+          },
+        ],
+      }).compile();
+
+      const serviceWithoutHeaders = module.get<OllamaService>(OllamaService);
+      await serviceWithoutHeaders.onModuleInit();
+
+      expect(serviceWithoutHeaders).toBeDefined();
+      expect(serviceWithoutHeaders.ollama).toBeDefined();
+    });
+  });
 });
